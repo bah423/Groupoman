@@ -9,7 +9,7 @@ const path = require('path')
 var fileUploadName;
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './uploads/')
+        cb(null, './uploads/images')
     },
     filename: function (req, file, cb) {
         this.fileUploadName = Date.now() + path.extname(file.originalname)
@@ -98,7 +98,7 @@ posts.get('/details/:slug', (req, res, next) => {
 })
 
 // Delete POST
-posts.delete('/delete/:id', (req, res, next) => {
+posts.delete('/:id', (req, res, next) => {
     Post.destroy({
         where: {
             id: req.params.id
@@ -111,6 +111,26 @@ posts.delete('/delete/:id', (req, res, next) => {
             res.send('error: ' + err)
         })
 })
+
+// getone POST
+posts.get('/:id', (req, res, next) => {
+    User.hasMany(Post, {foreignKey: 'user_id'})
+    Post.belongsTo(User, {foreignKey: 'user_id'})
+    Post.findAll({
+        where: {
+            id: req.params.id
+        } , include : [User]
+        
+        
+    })
+        .then((result) => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.send('error: ' + err)
+        })
+})
+
 
 // Update POST
 posts.put('/update/:id', (req, res, next) => {
@@ -140,6 +160,22 @@ posts.put('/update/:id', (req, res, next) => {
             })
             .error(err => handleError(err))
     }
+})
+
+
+// GET Comments by UserId
+posts.get('/byUser/:userId', (req, res, next) => {
+    Post.findAll({
+        where: {
+            user_id: req.params.userId
+        }
+    })
+        .then((result) => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.send('error: ' + err)
+        })
 })
 
 module.exports = posts

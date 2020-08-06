@@ -1,5 +1,6 @@
 <template>
     <div>
+      <div class="container">
         <form v-on:submit.prevent="login">
             <div class="form-group">
               <label for="exampleInputEmail1">Email address</label>
@@ -9,8 +10,10 @@
               <label for="exampleInputPassword1">Password</label>
               <input type="password" class="form-control" id="exampleInputPassword1" v-model="password">
             </div>
-            <button type="submit" class="btn btn-primary">Valider</button>
+            <button type="submit" class="btn btn-primary">connexion</button>
+            <router-link class="nav-link" to="/register">Vous n'avez pas un compte ? inscrivez-vous</router-link>
           </form>
+    </div>
     </div>
 </template>
 <script>
@@ -27,17 +30,23 @@ export default { data() {
         login() { 
             axios.post('http://localhost:3000/users/login',{ email: this.email, password: this.password })
             .then(res => { 
-                sessionStorage.setItem('usertoken', res.data.token) 
-                sessionStorage.setItem('user_id', res.data.id) 
+                localStorage.setItem('usertoken', res.data.token) 
+                localStorage.setItem('user_id', res.data.id)
+                 
                 console.log(res)
                  this.email='' 
                  this.password='' 
-                 router.push({name: 'Home'}) })
-                 .catch(err => { console.log(err) }) 
+                 router.push({name: 'Posts'}) })
+                 .catch(err => { console.log(err) , alert("Veuillez vérifier vos données") }) 
                  this.emitMethod() }, 
                  emitMethod() { EventBus.$emit('logged-in','loggedin') 
                  }
       }
     }
 </script>
+
+<style lang="stylus" scoped>
+
+</style>
+
 
